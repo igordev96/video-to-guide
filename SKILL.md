@@ -42,7 +42,19 @@ The script automatically:
 
 **Non-English transcripts:** If the video has no English transcript but has a native-language transcript (e.g., Portuguese auto-generated), fetch that transcript and **translate the content into English** while creating the guide. Do not refuse the video. The guide language should match what the user would expect — if they asked in English, deliver in English.
 
-**No transcript available:** If the script fails with "No transcripts available", inform the user and ask if they can provide the transcript manually.
+**No transcript available:** If the script fails with "No transcripts available" or "Transcripts disabled", offer the user a choice:
+
+> The script couldn't fetch the transcript automatically (YouTube may have restricted this video). You have two options:
+>
+> **1. Agentic fetch** — I use my web browsing tools to try to get the transcript directly from the YouTube page (uses more tokens, but handles restricted videos).
+>
+> **2. Manual paste** — You copy the transcript from YouTube (click the three dots below the video → "Show transcript") and paste it here. Saves tokens and works for any video.
+>
+> Which do you prefer?
+
+**Option 1 — Agentic Web Fetch:** Use WebFetch to request the YouTube video page and extract the transcript data from the page's JSON data. If the video has a transcript available via the web interface, it can usually be found in the page source. Extract and process it, then proceed to guide creation.
+
+**Option 2 — Manual Paste:** If the user provides transcript text directly, use that instead. Process it the same way — remove fillers, fix encoding, structure into the guide format.
 
 ## Guide Structure
 
