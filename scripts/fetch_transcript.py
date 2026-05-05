@@ -16,25 +16,16 @@ def extract_video_id(url_or_id):
         match = re.search(pattern, url_or_id)
         if match:
             return match.group(1)
-    # If no pattern matches, assume it's already a video ID
     return url_or_id.strip()
 
 def normalize_encoding(text):
     """Fix common encoding issues in YouTube transcripts."""
-    # Common encoding artifacts from YouTube transcripts
     replacements = [
-        ("â€\"", "—"),   # em-dash
-        ("â€"", '"'),   # left double quote
-        ("â€œ", '"'),   # left double quote
-        ("â€'", "'"),   # left single quote
-        ("â€™", "'"),   # right single quote / apostrophe
-        ("â€"", '"'),   # right double quote
-        ("“", '"'),  # left double quotation mark
-        ("”", '"'),  # right double quotation mark
-        ("‘", "'"),  # left single quotation mark
-        ("’", "'"),  # right single quotation mark / apostrophe
         ("—", "—"),  # em-dash
-        ("–", "–"),  # en-dash
+        ("“", '"'),  # left double quote
+        ("”", '"'),  # right double quote
+        ("‘", "'"),  # left single quote
+        ("’", "'"),  # right single quote / apostrophe
     ]
     for garbled, correct in replacements:
         text = text.replace(garbled, correct)
@@ -57,7 +48,6 @@ def main():
             timeout=60
         )
         if result.returncode == 0:
-            # Normalize encoding artifacts
             normalized = normalize_encoding(result.stdout)
             print(normalized)
         else:
