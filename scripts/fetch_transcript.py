@@ -14,6 +14,7 @@ import json
 import re
 import urllib.request
 from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound
 
 def extract_video_id(url_or_id):
     """Extract video ID from a YouTube URL or use the string directly as ID."""
@@ -75,47 +76,49 @@ def fetch_transcript(video_id, preferred_languages=None):
 
     title = get_video_title(video_id)
 
-    transcript = None
-    transcript_list = None
+    # Create API instance and try to fetch directly with preferred languages
+    api = YouTubeTranscriptApi()
 
+    for lang in preferred_languages:
+        try:
+            fetched = api.fetch(video_id, languages=[lang])
+            entries = []
+            for entry in fetched:
+                entries.append({
+                    "text": entry.text,
+                    "start": entry.start,
+                    "duration": entry.duration
+                })
+            return title, entries
+        except Exception:
+            continue
+
+    # Last resort: try to get any transcript that's available
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # List available transcripts to find any usable one
+        transcript_list = api.list(video_id)
+        all_transcripts = list(transcript_list)
 
-        # Try explicitly requested languages first
-        for lang in preferred_languages:
-            try:
-                transcript = transcript_list.find_transcript([lang])
-                break
-            except Exception:
-                continue
+        if all_transcripts:
+            # Prefer manually created over auto-generated
+            manual = [t for t in all_transcripts if not t.is_generated]
+            auto = [t for t in all_transcripts if t.is_generated]
+            chosen = manual[0] if manual else auto[0]
 
+            fetched = chosen.fetch()
+            entries = []
+            for entry in fetched:
+                entries.append({
+                    "text": entry.text,
+                    "start": entry.start,
+                    "duration": entry.duration
+                })
+            return title, entries
     except Exception:
         pass
 
-    # Last resort: grab whatever exists
-    if transcript is None and transcript_list is not None:
-        try:
-            all_transcripts = list(transcript_list)
-            if all_transcripts:
-                manual = [t for t in all_transcripts if not t.is_generated]
-                auto = [t for t in all_transcripts if t.is_generated]
-                transcript = manual[0] if manual else auto[0]
-        except Exception:
-            pass
-
-    if transcript is None:
-        print("Error: No transcripts available for this video.")
-        sys.exit(1)
-
-    fetched = transcript.fetch()
-    entries = []
-    for entry in fetched:
-        entries.append({
-            "text": entry.text,
-            "start": entry.start,
-            "duration": entry.duration
-        })
-    return title, entries
+    print("Error: No transcripts available for this video.")
+    sys.exit(1)
 
 def main():
     if sys.platform == "win32":
