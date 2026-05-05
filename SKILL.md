@@ -13,7 +13,7 @@ Before running the transcript script:
 
 1. **Prefer `uv run`** if available — `uv run python scripts/fetch_transcript.py "<URL>"`
 2. **Fallback**: `python scripts/fetch_transcript.py "<URL>"`
-3. **If dependency missing**: install with `uv pip install youtube-transcript-api` or `pip install youtube-transcript-api`
+3. **If dependency missing**: install with `pip install -r requirements.txt` (recommended) or `pip install youtube-transcript-api`
 4. **On Windows**: always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters
 
 ## Workflow
@@ -28,7 +28,8 @@ Before running the transcript script:
    ```
 3. **Process and clean** the transcript (remove fillers, fix encoding artifacts, preserve depth and tone)
 4. **Structure into a guide** using the format below
-5. **Return the final markdown guide**
+5. **Write the guide to a `.md` file** in the user's project directory — do NOT just print it to the terminal. Save it as `[video-title].md` or `guide.md` in the current working directory. Tell the user the file was saved.
+6. **Return the guide** (you can also show it inline, but the file is required)
 
 ## Transcript Fetching Details
 

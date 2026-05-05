@@ -29,6 +29,10 @@ The skill will:
 If you're on **Windows** or use **uv**, and the script fails to find `youtube-transcript-api`, install the dependency:
 
 ```bash
+# Option 1: via requirements.txt (recommended)
+pip install -r requirements.txt
+
+# Option 2: direct install
 uv pip install youtube-transcript-api
 # or
 pip install youtube-transcript-api
