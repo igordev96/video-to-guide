@@ -1,6 +1,6 @@
 ---
 name: video-to-guide
-description: Transforms YouTube videos into exhaustive written guides. Use when the user says "turn this video into a guide", "convert this video into a study guide", "create a guide from this video", "make a written guide from this YouTube video", or any variation asking to transform a video into a written, structured format. Handles transcript extraction, language fallback, and cleaning. Automatically fetches the video title and tries English first, then Portuguese and Spanish, then any available transcript.
+description: Transforms YouTube videos into full, structured written guides — every detail preserved, no summarizing. Use when the user wants to turn a video into a guide, study notes, learning material, or any written format that captures the full depth of the content. The skill fetches the transcript automatically and produces exhaustive guides with headers, bullet points, and key takeaways. Triggers on phrases like "turn this into a guide", "make a written guide from this video", "create study notes from this video", "convert this to a guide", or any variation asking to transform video content into detailed written form.
 ---
 
 # Video-to-Guide Skill
