@@ -1,0 +1,23 @@
+{
+  "skill_name": "video-to-guide",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "turn this video into a study guide: https://www.youtube.com/watch?v=WL6VSc5XQ-8",
+      "expected_output": "A complete markdown guide with title, Overview, Detailed Breakdown sections organized by topic, Context section if needed, and Key Takeaways. No summarizing — full depth preserved.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "convert this youtube video into a written guide: https://www.youtube.com/watch?v=hX7yG1KVYhI",
+      "expected_output": "Full markdown guide following the skill's format — headers, bullet points, bolded terms, callouts for emphasized points, and a Key Takeaways section extracted from the full content.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "make a written guide from this video https://www.youtube.com/watch?v=PEnkQC5hA5M",
+      "expected_output": "Structured markdown guide with all topics covered in depth, visual references described in-context, filler words removed, and a Key Takeaways section.",
+      "files": []
+    }
+  ]
+}
