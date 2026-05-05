@@ -1,33 +1,47 @@
 ---
 name: video-to-guide
-description: Turns YouTube videos into full, structured written guides — every detail preserved, no summarizing. Use when the user says "turn this video into a guide", "convert this video into a study guide", "create a guide from this video", "make a written guide from this YouTube video", or any variation asking to transform a video into a written, structured format. The skill fetches the transcript automatically and produces an exhaustive guide organized with headers, bullet points, and a Key Takeaways section.
+description: Transforms YouTube videos into exhaustive written guides. Use when the user says "turn this video into a guide", "convert this video into a study guide", "create a guide from this video", "make a written guide from this YouTube video", or any variation asking to transform a video into a written, structured format. Handles transcript extraction, language fallback, and cleaning. Automatically fetches the video title and tries English first, then Portuguese and Spanish, then any available transcript.
 ---
 
 # Video-to-Guide Skill
 
 This skill transforms a YouTube video into a complete, structured written guide. It extracts every instruction, example, and explanation — no details omitted, no summarizing.
 
+## Environment Pre-flight
+
+Before running the transcript script:
+
+1. **Prefer `uv run`** if available — `uv run python scripts/fetch_transcript.py "<URL>"`
+2. **Fallback**: `python scripts/fetch_transcript.py "<URL>"`
+3. **If dependency missing**: install with `uv pip install youtube-transcript-api` or `pip install youtube-transcript-api`
+4. **On Windows**: always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters
+
 ## Workflow
 
 1. **Receive a YouTube URL** from the user
-2. **Fetch the transcript** using the bundled script (`scripts/fetch_transcript.py`)
+2. **Fetch the transcript** by running the bundled script:
+   ```bash
+   # Prefer uv if available
+   uv run python scripts/fetch_transcript.py "<YouTube_URL>"
+   # Or just python
+   python scripts/fetch_transcript.py "<YouTube_URL>"
+   ```
 3. **Process and clean** the transcript (remove fillers, fix encoding artifacts, preserve depth and tone)
 4. **Structure into a guide** using the format below
 5. **Return the final markdown guide**
 
-## Transcript Fetching
+## Transcript Fetching Details
 
-Run the script to get the transcript:
+The script automatically:
+- Extracts the video ID from URLs or accepts video IDs directly
+- Fetches the video title via oEmbed API
+- Tries languages in order: English → Portuguese → Spanish → any available auto-generated
+- Normalizes encoding artifacts (`â€"` → `—`, etc.)
+- Outputs UTF-8 safe text
 
-```bash
-python scripts/fetch_transcript.py "<YouTube_URL or video ID>"
-```
+**Non-English transcripts:** If the video has no English transcript but has a native-language transcript (e.g., Portuguese auto-generated), fetch that transcript and **translate the content into English** while creating the guide. Do not refuse the video. The guide language should match what the user would expect — if they asked in English, deliver in English.
 
-The script accepts either a full YouTube URL or just the video ID, and handles the extraction automatically. The script outputs the full transcript text to stdout. Capture it and proceed.
-
-If the script fails (video has no transcript available), inform the user and ask if they can provide the transcript manually. If only a non-English transcript is available, fetch that and process it — do not refuse a video just because it's not in English.
-
-**Encoding normalization:** The fetch script automatically cleans up common encoding artifacts (like `â€"` for em-dashes, curly quotes becoming garbled, etc.). This happens during transcript fetching, so the raw transcript is already clean when you receive it.
+**No transcript available:** If the script fails with "No transcripts available", inform the user and ask if they can provide the transcript manually.
 
 ## Guide Structure
 
@@ -93,3 +107,4 @@ Before returning the guide, verify:
 - [ ] Key Takeaways are genuinely extracted, not synthesized
 - [ ] Visual references are described in-context
 - [ ] The guide length feels proportional to the video's depth and length
+- [ ] Non-English transcripts have been translated to match the user's expected language
