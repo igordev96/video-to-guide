@@ -26,15 +26,10 @@ The skill will:
 
 ## Setup for Work Environments
 
-The script uses [uv](https://github.com/astral-sh/uv) and automatically installs its dependency. If `uv` is not available, install manually:
+The script uses [uv](https://github.com/astral-sh/uv) and automatically installs its dependency:
 
 ```bash
-# uv (recommended — auto-installs dependencies)
 uv run scripts/fetch_transcript.py "<YouTube_URL>"
-
-# Manual dependency
-pip install youtube-transcript-api
-python scripts/fetch_transcript.py "<YouTube_URL>"
 ```
 
 On Windows, always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters.
@@ -46,6 +41,7 @@ On Windows, always write output to a `.md` file directly rather than relying on 
 - **Encoding normalization**: fixes garbled characters that often appear in YouTube auto-transcripts
 - **No summarizing**: every example, nuance, and explanation is preserved
 - **Video title auto-fetch**: extracts the title via oEmbed API so the guide header is accurate
+- **JSON output mode**: use `--json` flag for structured output suitable for programmatic use
 
 ## Example
 

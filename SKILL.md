@@ -1,6 +1,6 @@
 ---
 name: video-to-guide
-description: Transforms YouTube videos into full, structured written guides — every detail preserved, no summarizing. Use when the user wants to turn a video into a guide, study notes, learning material, or any written format that captures the full depth of the content. The skill fetches the transcript automatically and produces exhaustive guides with headers, bullet points, and key takeaways. Triggers on phrases like "turn this into a guide", "make a written guide from this video", "create study notes from this video", "convert this to a guide", or any variation asking to transform video content into detailed written form.
+description: Transforms YouTube videos into full, structured written guides — every detail preserved, no summarizing. Use when the user wants to turn a video into a guide, study notes, learning material, or any written format that captures the full depth of the content. The skill fetches the transcript automatically and produces exhaustive guides with headers, bullet points, and key takeaways. Triggers on phrases like "turn this into a guide", "make study notes from this video", "make a written guide from this video", "create a guide from this video", "turn this into study notes", "I need a written version of this video", "document this video", "write out this video", "transcript this video", "create a transcript guide from", "extract the content from this video as a guide", "convert this video to a guide", "create study notes from this video", or any variation asking to transform video content into detailed written form.
 ---
 
 # Video-to-Guide Skill
@@ -9,11 +9,11 @@ This skill transforms a YouTube video into a complete, structured written guide.
 
 ## Environment Pre-flight
 
-Before running the transcript script:
+The script uses [uv](https://github.com/astral-sh/uv) and automatically installs its dependency.
 
-1. **Primary Method**: `uv run scripts/fetch_transcript.py "<URL>"` (Automatically handles dependencies)
-2. **Standard Method**: `python scripts/fetch_transcript.py "<URL>"` (Requires `pip install youtube-transcript-api`)
-3. **On Windows**: Always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters.
+**Script invocation:** `uv run scripts/fetch_transcript.py "<YouTube_URL>" [--json] [--language <code>]`
+
+On Windows, always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters.
 
 ## Workflow
 
@@ -39,19 +39,9 @@ The script automatically:
 
 **Non-English transcripts:** If the video has no English transcript but has a native-language transcript (e.g., Portuguese auto-generated), fetch that transcript and **translate the content into English** while creating the guide. Do not refuse the video. The guide language should match what the user would expect — if they asked in English, deliver in English.
 
-**No transcript available:** If the script fails with "No transcripts available" or "Transcripts disabled", offer the user a choice:
+**No transcript available:** If the script fails with "No transcripts available" or "Transcripts disabled", ask the user to paste the transcript manually:
 
-> The script couldn't fetch the transcript automatically (YouTube may have restricted this video). You have two options:
->
-> **1. Agentic fetch** — I use my web browsing tools to try to get the transcript directly from the YouTube page (uses more tokens, but handles restricted videos).
->
-> **2. Manual paste** — You copy the transcript from YouTube (click the three dots below the video → "Show transcript") and paste it here. Saves tokens and works for any video.
->
-> Which do you prefer?
-
-**Option 1 — Agentic Web Fetch:** Use WebFetch to request the YouTube video page and extract the transcript data from the page's JSON data. If the video has a transcript available via the web interface, it can usually be found in the page source. Extract and process it, then proceed to guide creation.
-
-**Option 2 — Manual Paste:** If the user provides transcript text directly, use that instead. Process it the same way — remove fillers, fix encoding, structure into the guide format.
+> The script couldn't fetch the transcript automatically (YouTube may have restricted this video). Please copy the transcript from YouTube (click the three dots below the video → "Show transcript") and paste it here. I'll process it and create the guide from your pasted text.
 
 ## Guide Structure
 

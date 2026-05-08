@@ -11,6 +11,13 @@ import urllib.request
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound
 
+# Exit codes
+EXIT_SUCCESS = 0
+EXIT_GENERIC = 1
+EXIT_NO_TRANSCRIPTS = 2
+EXIT_INVALID_URL = 3
+EXIT_NETWORK = 4
+
 def extract_video_id(url_or_id):
     patterns = [
         r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([0-9A-Za-z_-]{11})',
@@ -19,7 +26,11 @@ def extract_video_id(url_or_id):
         match = re.search(pattern, url_or_id)
         if match:
             return match.group(1)
-    return url_or_id.strip()
+    video_id = url_or_id.strip()
+    if len(video_id) == 11 and re.match(r'^[0-9A-Za-z_-]+$', video_id):
+        return video_id
+    print("Error: Invalid URL or video ID", file=sys.stderr)
+    sys.exit(EXIT_INVALID_URL)
 
 def get_video_title(video_id):
     try:
@@ -27,6 +38,8 @@ def get_video_title(video_id):
         with urllib.request.urlopen(url, timeout=10) as response:
             data = json.loads(response.read().decode("utf-8"))
             return data.get("title", f"Video {video_id}")
+    except urllib.error.HTTPError:
+        raise
     except Exception:
         return f"Video {video_id}"
 
@@ -56,6 +69,7 @@ def fetch_transcript(video_id, preferred_languages=None):
 
     title = get_video_title(video_id)
     api = YouTubeTranscriptApi()
+    detected_language = None
 
     for lang in preferred_languages:
         try:
@@ -67,7 +81,8 @@ def fetch_transcript(video_id, preferred_languages=None):
                     "start": entry.start,
                     "duration": entry.duration
                 })
-            return title, entries
+            detected_language = lang
+            return title, entries, detected_language
         except Exception:
             continue
 
@@ -88,37 +103,60 @@ def fetch_transcript(video_id, preferred_languages=None):
                     "start": entry.start,
                     "duration": entry.duration
                 })
-            return title, entries
+            detected_language = chosen.language_code
+            return title, entries, detected_language
     except Exception:
         pass
 
-    print("Error: No transcripts available for this video.")
-    sys.exit(1)
+    print("Error: No transcripts available for this video.", file=sys.stderr)
+    sys.exit(EXIT_NO_TRANSCRIPTS)
 
 def main():
     if sys.platform == "win32":
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     if len(sys.argv) < 2:
-        print("Usage: uv run scripts/fetch_transcript.py <YouTube_URL>")
-        sys.exit(1)
+        print("Usage: uv run scripts/fetch_transcript.py <YouTube_URL> [--json] [--language <code>]", file=sys.stderr)
+        sys.exit(EXIT_GENERIC)
 
+    use_json = "--json" in sys.argv
     preferred_languages = ["en", "pt", "es"]
+
+    lang_idx = None
+    if "--language" in sys.argv:
+        lang_idx = sys.argv.index("--language")
+        if lang_idx + 1 < len(sys.argv):
+            preferred_languages = [sys.argv[lang_idx + 1]]
+
     video_arg = sys.argv[1]
-
-    if len(sys.argv) > 2 and sys.argv[2] == "--language":
-        if len(sys.argv) > 3:
-            preferred_languages = [sys.argv[3]]
-
     video_id = extract_video_id(video_arg)
-    title, entries = fetch_transcript(video_id, preferred_languages)
 
-    print(f"TITLE: {title}")
-    print("-" * 40)
+    try:
+        title, entries, language = fetch_transcript(video_id, preferred_languages)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            print("Error: Video not found (404)", file=sys.stderr)
+            sys.exit(EXIT_INVALID_URL)
+        print("Error: Network error while fetching video", file=sys.stderr)
+        sys.exit(EXIT_NETWORK)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(EXIT_GENERIC)
 
-    for entry in entries:
-        text = normalize_encoding(entry["text"])
-        print(text)
+    if use_json:
+        output = {
+            "title": title,
+            "video_id": video_id,
+            "language": language,
+            "entries": entries
+        }
+        print(json.dumps(output, ensure_ascii=False))
+    else:
+        print(f"TITLE: {title}")
+        print("-" * 40)
+        for entry in entries:
+            text = normalize_encoding(entry["text"])
+            print(text)
 
 if __name__ == "__main__":
     main()
