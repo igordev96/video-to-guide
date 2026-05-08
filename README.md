@@ -26,19 +26,18 @@ The skill will:
 
 ## Setup for Work Environments
 
-If you're on **Windows** or use **uv**, and the script fails to find `youtube-transcript-api`, install the dependency:
+The script uses [uv](https://github.com/astral-sh/uv) and automatically installs its dependency. If `uv` is not available, install manually:
 
 ```bash
-# Option 1: via requirements.txt (recommended)
-pip install -r requirements.txt
+# uv (recommended — auto-installs dependencies)
+uv run scripts/fetch_transcript.py "<YouTube_URL>"
 
-# Option 2: direct install
-uv pip install youtube-transcript-api
-# or
+# Manual dependency
 pip install youtube-transcript-api
+python scripts/fetch_transcript.py "<YouTube_URL>"
 ```
 
-The script uses in-process API calls (no subprocess) so it works reliably across different Python environments — uv, virtualenv, or system Python.
+On Windows, always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters.
 
 ## Features
 
