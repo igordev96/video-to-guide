@@ -11,20 +11,16 @@ This skill transforms a YouTube video into a complete, structured written guide.
 
 Before running the transcript script:
 
-1. **Prefer `uv run`** if available — `uv run python scripts/fetch_transcript.py "<URL>"`
-2. **Fallback**: `python scripts/fetch_transcript.py "<URL>"`
-3. **If dependency missing**: install with `pip install -r requirements.txt` (recommended) or `pip install youtube-transcript-api`
-4. **On Windows**: always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters
+1. **Primary Method**: `uv run scripts/fetch_transcript.py "<URL>"` (Automatically handles dependencies)
+2. **Standard Method**: `python scripts/fetch_transcript.py "<URL>"` (Requires `pip install youtube-transcript-api`)
+3. **On Windows**: Always write output to a `.md` file directly rather than relying on terminal display to avoid garbled characters.
 
 ## Workflow
 
 1. **Receive a YouTube URL** from the user
 2. **Fetch the transcript** by running the bundled script:
    ```bash
-   # Prefer uv if available
-   uv run python scripts/fetch_transcript.py "<YouTube_URL>"
-   # Or just python
-   python scripts/fetch_transcript.py "<YouTube_URL>"
+   uv run scripts/fetch_transcript.py "<YouTube_URL>"
    ```
 3. **Process and clean** the transcript (remove fillers, fix encoding artifacts, preserve depth and tone)
 4. **Structure into a guide** using the format below
@@ -34,6 +30,7 @@ Before running the transcript script:
 ## Transcript Fetching Details
 
 The script automatically:
+
 - Extracts the video ID from URLs or accepts video IDs directly
 - Fetches the video title via oEmbed API
 - Tries languages in order: English → Portuguese → Spanish → any available auto-generated
@@ -64,20 +61,25 @@ Follow this exact format:
 # [Video Title]
 
 ## Overview
+
 [Brief description of what the video covers — 1-2 sentences. Not a summary, just orientation.]
 
 ## Detailed Breakdown
 
 ### [Topic 1]
+
 [All content related to this topic — every point, example, and nuance captured. Write generously. A video covering a topic in depth should produce a guide that reflects that depth.]
 
 ### [Topic 2]
+
 [Continue through the video's logical flow. Do not cut corners on length — if the speaker spent 5 minutes on a topic, your section should be substantial, not a 2-sentence summary.]
 
 ## Context (if needed)
+
 [Only if the speaker's wandering was meaningful to a point. Brief 1-2 sentence resume of non-essential but relevant background.]
 
 ## Key Takeaways
+
 - [Point 1 — extracted from the full content, not a substitute for it]
 - [Point 2]
 - [Point 3]
@@ -86,6 +88,7 @@ Follow this exact format:
 ## Expected Guide Length
 
 Guides should be **substantial** — not short summaries. If a video is 20-45 minutes and covers a topic thoroughly, the guide should reflect that same depth. A good rule of thumb:
+
 - A 5-minute quick tip video → guide is roughly 400-800 words
 - A 20-minute tutorial → guide is roughly 1500-2500 words
 - A 45+ minute masterclass → guide is roughly 3000+ words
@@ -114,6 +117,7 @@ If your guide feels "short" for the video's length, you are likely condensing. G
 ## Quality Check
 
 Before returning the guide, verify:
+
 - [ ] Every major topic from the video appears in the guide
 - [ ] No section is a thin summary — each has full depth
 - [ ] Filler words are removed but meaning is preserved
